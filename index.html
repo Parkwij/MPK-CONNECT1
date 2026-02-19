@@ -7,6 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // Inline fallback password
+        (function(){ window._x1 = "mpk2026"; })();
+    </script>
+    <script src="pw.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -73,8 +78,8 @@
             font-family: 'Cinzel Decorative', serif;
             font-size: 1.9rem;
             font-weight: 900;
-            color: var(--red);
-            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            color: #e94560;
+            text-shadow: 0 0 20px rgba(233,69,96,0.7);
             letter-spacing: 4px;
         }
 
@@ -114,15 +119,6 @@
             box-shadow: 0 3px 12px rgba(233,69,96,0.25);
         }
 
-        /* ─── HERO FULLBLEED ─── */
-        /*
-         * BG.jpg harus satu folder dengan file HTML ini.
-         * Simpan foto crime board Anda dengan nama persis: BG.jpg
-         * Contoh struktur folder:
-         *   📁 project/
-         *      ├── index.html  (file ini)
-         *      └── BG.jpg      (foto background)
-        */
         .hero-fullbleed {
             position: relative;
             width: 100%;
@@ -138,7 +134,6 @@
             justify-content: flex-end;
         }
 
-        /* Gradient overlay gelap dari atas ke bawah */
         .hero-fullbleed::before {
             content: '';
             position: absolute;
@@ -153,7 +148,6 @@
             z-index: 1;
         }
 
-        /* Vignette merah di kiri */
         .hero-fullbleed::after {
             content: '';
             position: absolute;
@@ -169,8 +163,6 @@
             margin: 0 auto;
             padding: 0 2rem 4rem;
             width: 100%;
-            display: flex;
-            flex-direction: column;
         }
 
         .hero-eyebrow {
@@ -179,12 +171,10 @@
             letter-spacing: 4px;
             color: #e94560;
             text-transform: uppercase;
+            margin-bottom: 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            align-self: flex-end;
-            order: 10;
-            margin-top: 2rem;
         }
 
         .hero-eyebrow::before {
@@ -397,17 +387,6 @@
             margin-left: 1rem;
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg,#c62828,#8e0000);
-            margin-left: 1rem;
-            box-shadow: 0 4px 18px rgba(198,40,40,0.4);
-        }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg,#b71c1c,#7f0000);
-            box-shadow: 0 7px 25px rgba(198,40,40,0.6);
-        }
-
         /* ─── CHART ─── */
         .chart-container { padding: 2rem; margin-top: 2rem; }
 
@@ -551,7 +530,6 @@
     <!-- HOME WRAPPER -->
     <div id="home-page">
 
-        <!-- HERO FULLBLEED — background diambil dari BG.jpg satu folder dengan file ini -->
         <div class="hero-fullbleed">
             <div class="hero-content">
                 <div class="hero-eyebrow">MPK SMA Negeri 6 &middot; Your Voice Matters</div>
@@ -634,7 +612,6 @@
                 <div class="glass-card data-table">
                     <h3>Case Files Archive</h3>
                     <button onclick="exportToExcel('aspirasi')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Evidence to Excel</button>
-                    <button onclick="resetData('aspirasi')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Aspirasi Data</button>
                     <table id="aspirasi-table">
                         <thead><tr><th>Case #</th><th>Timestamp</th><th>Witness</th><th>Location</th><th>Category</th><th>Testimony</th></tr></thead>
                         <tbody></tbody>
@@ -691,7 +668,6 @@
                 <div class="glass-card data-table">
                     <h3>Verdict Archive</h3>
                     <button onclick="exportToExcel('evaluasi')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Verdicts to Excel</button>
-                    <button onclick="resetData('evaluasi')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Evaluasi Data</button>
                     <table id="evaluasi-table">
                         <thead><tr><th>Verdict #</th><th>Timestamp</th><th>Judge</th><th>Courtroom</th><th>Performance</th><th>Score</th><th>Judgment</th></tr></thead>
                         <tbody></tbody>
@@ -737,7 +713,6 @@
                 <div class="glass-card data-table">
                     <h3>Whispered Archive</h3>
                     <button onclick="exportToExcel('saran')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Whispers to Excel</button>
-                    <button onclick="resetData('saran')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Saran Data</button>
                     <table id="saran-table">
                         <thead><tr><th>Whisper #</th><th>Timestamp</th><th>Informant</th><th>Source</th><th>Directed To</th><th>Secret Message</th></tr></thead>
                         <tbody></tbody>
@@ -752,9 +727,6 @@
         let aspirationData = JSON.parse(localStorage.getItem('aspirationData')) || [];
         let evaluationData = JSON.parse(localStorage.getItem('evaluationData')) || [];
         let suggestionData  = JSON.parse(localStorage.getItem('suggestionData'))  || [];
-
-        // ── Ganti password di sini ──
-        const ADMIN_PASSWORD = "mpk2024";
 
         /* Navigation */
         function switchPage(page) {
@@ -786,10 +758,14 @@
             });
         });
 
-        /* Admin unlock */
+        /* Admin unlock - password dari pw.js via window._x1 */
         function checkAdminPassword(type) {
-            const pw = document.getElementById('admin-password-' + type).value;
-            if (pw === ADMIN_PASSWORD) {
+            const pw = document.getElementById('admin-password-' + type).value.trim();
+            if (typeof window._x1 === 'undefined') {
+                alert('⚠️ System error. Refresh halaman dan coba lagi.');
+                return;
+            }
+            if (pw === window._x1) {
                 document.getElementById(type + '-locked').style.display = 'none';
                 document.getElementById(type + '-admin').classList.add('unlocked');
                 if (type === 'aspirasi') updateChart();
@@ -926,51 +902,6 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, type);
             XLSX.writeFile(wb, name);
-        }
-
-        /* Reset Data */
-        function resetData(type) {
-            const confirmMsg = type === 'all' 
-                ? '⚠️ WARNING: This will DELETE ALL DATA from Aspirasi, Evaluasi, AND Saran!\n\nAre you absolutely sure?' 
-                : `⚠️ Are you sure you want to delete all ${type.toUpperCase()} data?\n\nThis action cannot be undone!`;
-            
-            if (!confirm(confirmMsg)) return;
-
-            // Double confirm for safety
-            const secondConfirm = confirm('🚨 FINAL CONFIRMATION\n\nClick OK to permanently delete the data.');
-            if (!secondConfirm) return;
-
-            if (type === 'all') {
-                aspirationData = [];
-                evaluationData = [];
-                suggestionData = [];
-                localStorage.removeItem('aspirationData');
-                localStorage.removeItem('evaluationData');
-                localStorage.removeItem('suggestionData');
-                
-                updateTable('aspirasi');
-                updateTable('evaluasi');
-                updateTable('saran');
-                updateChart();
-                
-                alert('✅ All data has been permanently deleted.');
-            } else {
-                if (type === 'aspirasi') {
-                    aspirationData = [];
-                    localStorage.removeItem('aspirationData');
-                    updateTable('aspirasi');
-                    updateChart();
-                } else if (type === 'evaluasi') {
-                    evaluationData = [];
-                    localStorage.removeItem('evaluationData');
-                    updateTable('evaluasi');
-                } else if (type === 'saran') {
-                    suggestionData = [];
-                    localStorage.removeItem('suggestionData');
-                    updateTable('saran');
-                }
-                alert(`✅ All ${type} data has been deleted.`);
-            }
         }
     </script>
 </body>
