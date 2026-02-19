@@ -1,0 +1,1 @@
+const ADMIN_PASSWORD = "mpk2024";

@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPK CONNECT - The Stage of Silence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Special+Elite&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --red: #e94560;
+            --dark: #0a0814;
+            --navy: #0f3460;
+            --glass: rgba(10, 8, 20, 0.80);
+        }
+
+        body {
+            font-family: 'Special Elite', cursive;
+            background: var(--dark);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ─── TOPBAR ─── */
+        .topbar {
+            background: #0a0814;
+            border-bottom: 1px solid rgba(233,69,96,0.3);
+            padding: 0.4rem 2rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .topbar span { color: #e94560; }
+
+        /* ─── HEADER ─── */
+        header {
+            background: rgba(10, 8, 20, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 0.9rem 2rem;
+            position: sticky;
+            top: 30px;
+            z-index: 1000;
+            border-bottom: 2px solid #e94560;
+            box-shadow: 0 4px 30px rgba(233, 69, 96, 0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-block {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-main {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #e8e8e8;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+            letter-spacing: 4px;
+        }
+
+        .logo-sub {
+            font-family: 'Cinzel', serif;
+            font-size: 0.6rem;
+            color: #888;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 0.3rem;
+        }
+
+        nav a {
+            font-family: 'Cinzel', serif;
+            color: #c0c0c0;
+            text-decoration: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            letter-spacing: 1px;
+            border: 1px solid transparent;
+        }
+
+        nav a:hover, nav a.active {
+            background: rgba(233,69,96,0.15);
+            color: #e94560;
+            border-color: #e94560;
+            box-shadow: 0 3px 12px rgba(233,69,96,0.25);
+        }
+
+        /* ─── HERO FULLBLEED ─── */
+        /*
+         * BG.jpg harus satu folder dengan file HTML ini.
+         * Simpan foto crime board Anda dengan nama persis: BG.jpg
+         * Contoh struktur folder:
+         *   📁 project/
+         *      ├── index.html  (file ini)
+         *      └── BG.jpg      (foto background)
+        */
+        .hero-fullbleed {
+            position: relative;
+            width: 100%;
+            height: 90vh;
+            min-height: 580px;
+            background-image: url('BG-hitam.jpg');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        /* Gradient overlay gelap dari atas ke bawah */
+        .hero-fullbleed::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(10,8,20,0.30) 0%,
+                rgba(10,8,20,0.10) 35%,
+                rgba(10,8,20,0.65) 70%,
+                rgba(10,8,20,0.97) 100%
+            );
+            z-index: 1;
+        }
+
+        /* Vignette merah di kiri */
+        .hero-fullbleed::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(233,69,96,0.18) 0%, transparent 55%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-eyebrow {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: #e94560;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            align-self: flex-end;
+            order: 10;
+            margin-top: 2rem;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 2px;
+            background: #e94560;
+        }
+
+        .hero-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.05;
+            text-shadow: 0 4px 30px rgba(0,0,0,0.8), 0 0 60px rgba(233,69,96,0.2);
+            margin-bottom: 1rem;
+            max-width: 700px;
+        }
+
+        .hero-title span { color: #e94560; }
+
+        .hero-sub {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: #ccc;
+            max-width: 550px;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+
+        .hero-cta-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            font-family: 'Cinzel', serif;
+            padding: 0.9rem 2.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-primary {
+            background: #e94560;
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(233,69,96,0.5);
+        }
+
+        .cta-primary:hover {
+            background: #d03350;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(233,69,96,0.7);
+        }
+
+        .cta-outline {
+            background: transparent;
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .cta-outline:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        /* ─── BANNER STRIP ─── */
+        .banner-strip {
+            display: flex;
+            background: var(--dark);
+            border-top: 2px solid #e94560;
+            border-bottom: 2px solid rgba(233,69,96,0.2);
+        }
+
+        .banner-item {
+            flex: 1;
+            padding: 1.6rem 2rem;
+            text-align: center;
+            border-right: 1px solid rgba(233,69,96,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #e0e0e0;
+        }
+
+        .banner-item:last-child { border-right: none; }
+
+        .banner-item:hover, .banner-item.active-nav {
+            background: #e94560;
+            color: #fff;
+        }
+
+        /* ─── CONTAINER ─── */
+        .container {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-section { display: none; animation: fadeIn 0.5s ease; }
+        .page-section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(18px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── GLASS CARD ─── */
+        .glass-card {
+            background: rgba(12, 10, 25, 0.82);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(233,69,96,0.25);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        /* ─── FORM ─── */
+        .form-container { padding: 3rem; margin-bottom: 2rem; }
+
+        .form-container h2 {
+            font-family: 'Cinzel Decorative', serif;
+            color: #e94560;
+            font-size: 1.9rem;
+            text-align: center;
+            margin-bottom: 0.4rem;
+            text-shadow: 0 0 20px rgba(233,69,96,0.4);
+            letter-spacing: 2px;
+        }
+
+        .form-subtitle {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        .form-group { margin-bottom: 1.4rem; }
+
+        .form-group label {
+            font-family: 'Cinzel', serif;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e94560;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            background: rgba(5,4,15,0.7);
+            border: 1px solid rgba(233,69,96,0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: 'Special Elite', cursive;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group select option { background: #1a1228; color: #e0e0e0; }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #e94560;
+            box-shadow: 0 0 16px rgba(233,69,96,0.3);
+        }
+
+        .form-group textarea { min-height: 140px; resize: vertical; }
+
+        .btn {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg,#e94560,#c0284a);
+            color: #fff;
+            padding: 0.85rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            box-shadow: 0 4px 18px rgba(233,69,96,0.4);
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 25px rgba(233,69,96,0.6); }
+
+        .btn-secondary {
+            background: linear-gradient(135deg,#0f3460,#0a2040);
+            margin-left: 1rem;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg,#c62828,#8e0000);
+            margin-left: 1rem;
+            box-shadow: 0 4px 18px rgba(198,40,40,0.4);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg,#b71c1c,#7f0000);
+            box-shadow: 0 7px 25px rgba(198,40,40,0.6);
+        }
+
+        /* ─── CHART ─── */
+        .chart-container { padding: 2rem; margin-top: 2rem; }
+
+        .chart-container h3 {
+            font-family: 'Cinzel', serif;
+            color: #e94560;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+        }
+
+        /* ─── TABLE ─── */
+        .data-table { padding: 2rem; margin-top: 1.5rem; overflow-x: auto; }
+
+        .data-table h3 {
+            font-family: 'Cinzel', serif;
+            color: #e94560;
+            margin-bottom: 1rem;
+            letter-spacing: 1.5px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        table th, table td {
+            padding: 0.9rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(233,69,96,0.12);
+            font-family: 'Special Elite', cursive;
+        }
+
+        table th {
+            font-family: 'Cinzel', serif;
+            background: rgba(233,69,96,0.18);
+            color: #e94560;
+            font-size: 0.78rem;
+            letter-spacing: 1px;
+        }
+
+        table tr:hover { background: rgba(233,69,96,0.06); }
+
+        /* ─── SUCCESS ─── */
+        .success-message {
+            font-family: 'Playfair Display', serif;
+            background: rgba(76,175,80,0.12);
+            border: 1px solid #4caf50;
+            color: #4caf50;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            display: none;
+            font-style: italic;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity:0; transform:translateY(-15px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ─── ADMIN ─── */
+        .admin-login { padding: 2rem; margin-top: 2rem; text-align: center; }
+
+        .admin-login h3 {
+            font-family: 'Cinzel', serif;
+            color: #e94560;
+            margin-bottom: 0.6rem;
+            letter-spacing: 2px;
+        }
+
+        .admin-login p { font-family: 'Playfair Display', serif; font-style: italic; }
+
+        .admin-login input {
+            padding: 0.75rem 1rem;
+            background: rgba(5,4,15,0.8);
+            border: 1px solid rgba(233,69,96,0.4);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-family: 'Special Elite', cursive;
+            margin-right: 0.8rem;
+            width: 200px;
+        }
+
+        .admin-section { display: none; }
+        .admin-section.unlocked { display: block; }
+
+        .locked-message { padding: 3rem; margin-top: 2rem; text-align: center; }
+
+        .locked-message h3 {
+            font-family: 'Cinzel Decorative', serif;
+            color: #e94560;
+            font-size: 1.7rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .locked-message p {
+            font-family: 'Playfair Display', serif;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            nav ul { flex-wrap: wrap; gap: 0.5rem; }
+            .hero-fullbleed { height: 70vh; }
+            .hero-title { font-size: 2rem; }
+            .banner-strip { flex-direction: column; }
+            .topbar { font-size: 0.6rem; }
+            .admin-login input { width: 100%; margin: 0 0 1rem 0; display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <span>MPK CONNECT</span>
+        <span style="color:#666">Majelis Perwakilan Kelas &middot; SMA Negeri 6 &middot; "Sound of Silence"</span>
+        <span>2025 / 2026</span>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <div class="logo-block">
+                <span class="logo-main">&#127917; MPK</span>
+                <span class="logo-sub">Majelis Perwakilan Kelas &middot; SMA 6</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" data-page="home">&#127968; The Stage</a></li>
+                    <li><a href="#" class="nav-link" data-page="aspirasi">&#128161; Voice in Darkness</a></li>
+                    <li><a href="#" class="nav-link" data-page="evaluasi">&#128202; The Verdict</a></li>
+                    <li><a href="#" class="nav-link" data-page="saran">&#128172; Whispered Truth</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HOME WRAPPER -->
+    <div id="home-page">
+
+        <!-- HERO FULLBLEED — background diambil dari BG.jpg satu folder dengan file ini -->
+        <div class="hero-fullbleed">
+            <div class="hero-content">
+                <div class="hero-eyebrow">MPK SMA Negeri 6 &middot; Your Voice Matters</div>
+                <h1 class="hero-title">
+                    SPEAK IN THE<br>
+                    <span>SILENCE</span>
+                </h1>
+                <p class="hero-sub">"In the theater of silence, every voice becomes a crime against conformity. The Sound of Silence is the loudest scream for change."</p>
+                <div class="hero-cta-row">
+                    <a href="#" class="cta-btn cta-primary nav-link" data-page="aspirasi">Submit Evidence &#128269;</a>
+                    <a href="#" class="cta-btn cta-outline nav-link" data-page="evaluasi">Deliver Verdict &#9878;&#65039;</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- BANNER STRIP -->
+        <div class="banner-strip">
+            <div class="banner-item nav-link" data-page="aspirasi">&#128161; Voice in Darkness</div>
+            <div class="banner-item nav-link" data-page="evaluasi">&#128202; The Verdict</div>
+            <div class="banner-item nav-link" data-page="saran">&#128172; Whispered Truth</div>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="container">
+            <section id="home" class="page-section active">
+                <div style="display:flex; gap:2.5rem; align-items:stretch; flex-wrap:wrap;">
+                    <div class="glass-card" style="flex:1; min-width:280px; padding:3rem;">
+                        <div style="font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:3px; color:#e94560; text-transform:uppercase; margin-bottom:0.8rem;">&#8212; Behind The Curtain</div>
+                        <h2 style="font-family:'Cinzel Decorative',serif; font-size:2rem; color:#fff; line-height:1.2; margin-bottom:1.5rem;">Behind The<br><span style="color:#e94560;">Crimson Curtain</span></h2>
+                        <p style="font-family:'Playfair Display',serif; font-style:italic; color:#bbb; line-height:1.9; margin-bottom:1rem;">Di balik panggung keheningan, MPK SMA 6 berdiri sebagai teater kejujuran. Setiap aspirasi adalah sebuah adegan, setiap kritik adalah plot twist.</p>
+                        <p style="font-family:'Playfair Display',serif; font-style:italic; color:#bbb; line-height:1.9; margin-bottom:1.5rem;">MPK CONNECT hadir sebagai platform digital untuk mempermudah komunikasi antara siswa dan organisasi MPK. Setiap kata adalah bukti yang tak terbantahkan untuk perubahan.</p>
+                        <p style="font-family:'Playfair Display',serif; font-style:italic; color:#e94560;">"We are not just representatives. We are the directors of change, the actors of justice, and the audience that refuses to be silent."</p>
+                    </div>
+                    <div class="glass-card" style="flex:0 0 320px; min-width:280px; display:flex; align-items:center; justify-content:center; font-size:9rem; padding:2rem;">&#127917;</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- SUB PAGES -->
+    <div class="container">
+
+        <!-- ASPIRASI -->
+        <section id="aspirasi" class="page-section">
+            <div class="glass-card form-container">
+                <h2>&#128161; Voice in Darkness</h2>
+                <p class="form-subtitle">"Your aspiration is evidence. Submit your testimony."</p>
+                <div id="aspirasi-success" class="success-message">&#10003; Your voice has been recorded in the archives of change. The investigation begins.</div>
+                <form id="aspirasi-form">
+                    <div class="form-group"><label>Identity of The Witness *</label><input type="text" id="aspirasi-nama" required placeholder="Nama lengkap Anda"></div>
+                    <div class="form-group"><label>Case Location *</label><input type="text" id="aspirasi-kelas" placeholder="Contoh: X-1, XI-2, XII-3" required></div>
+                    <div class="form-group">
+                        <label>Case File *</label>
+                        <select id="aspirasi-kategori" required>
+                            <option value="">Pilih Kategori Kasus</option>
+                            <option value="Event yang Sedang Berlangsung">&#127916; Event yang Sedang Berlangsung</option>
+                            <option value="Lainnya">&#128194; Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Your Testimony *</label><textarea id="aspirasi-isi" required placeholder="Ungkapkan bukti dan kesaksian Anda di sini..."></textarea></div>
+                    <button type="submit" class="btn">Submit Evidence</button>
+                </form>
+            </div>
+            <div class="glass-card admin-login">
+                <h3>&#128274; Detective's Access Only</h3>
+                <p style="color:#777; margin-bottom:1rem;">Enter the secret code to view the crime archives</p>
+                <input type="password" id="admin-password-aspirasi" placeholder="Secret Code">
+                <button onclick="checkAdminPassword('aspirasi')" class="btn">Unlock Archives</button>
+            </div>
+            <div id="aspirasi-locked" class="glass-card locked-message">
+                <h3>&#128274; Archives Sealed</h3>
+                <p>"The evidence is collected in darkness. Only the detectives may see the patterns in the shadows."</p>
+                <p style="margin-top:1rem; color:#e94560;">Data dan grafik hanya dapat dilihat oleh admin MPK.</p>
+            </div>
+            <div id="aspirasi-admin" class="admin-section">
+                <div class="glass-card chart-container">
+                    <h3>&#128200; Crime Pattern Analysis</h3>
+                    <canvas id="aspirationChart"></canvas>
+                </div>
+                <div class="glass-card data-table">
+                    <h3>Case Files Archive</h3>
+                    <button onclick="exportToExcel('aspirasi')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Evidence to Excel</button>
+                    <button onclick="resetData('aspirasi')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Aspirasi Data</button>
+                    <table id="aspirasi-table">
+                        <thead><tr><th>Case #</th><th>Timestamp</th><th>Witness</th><th>Location</th><th>Category</th><th>Testimony</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVALUASI -->
+        <section id="evaluasi" class="page-section">
+            <div class="glass-card form-container">
+                <h2>&#128202; The Verdict</h2>
+                <p class="form-subtitle">"Judge the performance. Rate the act. Deliver your verdict."</p>
+                <div id="evaluasi-success" class="success-message">&#10003; Verdict recorded. The jury of change acknowledges your judgment.</div>
+                <form id="evaluasi-form">
+                    <div class="form-group"><label>Judge Identity *</label><input type="text" id="evaluasi-nama" required placeholder="Nama lengkap Anda"></div>
+                    <div class="form-group"><label>Courtroom *</label><input type="text" id="evaluasi-kelas" placeholder="Contoh: X-1, XI-2, XII-3" required></div>
+                    <div class="form-group">
+                        <label>Performance Under Trial *</label>
+                        <select id="evaluasi-program" required>
+                            <option value="">Pilih Persidangan</option>
+                            <option value="OSIS">&#127963;&#65039; OSIS</option>
+                            <option value="MPK">&#127917; MPK</option>
+                            <option value="Event yang Sedang Berlangsung">&#127916; Event yang Sedang Berlangsung</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Verdict Score *</label>
+                        <select id="evaluasi-rating" required>
+                            <option value="">Pilih Penilaian</option>
+                            <option value="5">&#11088;&#11088;&#11088;&#11088;&#11088; Standing Ovation</option>
+                            <option value="4">&#11088;&#11088;&#11088;&#11088; Applause Worthy</option>
+                            <option value="3">&#11088;&#11088;&#11088; Acceptable Act</option>
+                            <option value="2">&#11088;&#11088; Needs Rehearsal</option>
+                            <option value="1">&#11088; Critical Failure</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Your Judgment *</label><textarea id="evaluasi-isi" required placeholder="Sampaikan penilaian Anda seperti kritikus teater yang kejam namun jujur..."></textarea></div>
+                    <button type="submit" class="btn">Deliver Verdict</button>
+                </form>
+            </div>
+            <div class="glass-card admin-login">
+                <h3>&#128274; Judge's Chamber Access</h3>
+                <p style="color:#777; margin-bottom:1rem;">Enter the secret code to view all verdicts</p>
+                <input type="password" id="admin-password-evaluasi" placeholder="Secret Code">
+                <button onclick="checkAdminPassword('evaluasi')" class="btn">Unlock Chamber</button>
+            </div>
+            <div id="evaluasi-locked" class="glass-card locked-message">
+                <h3>&#128274; Verdict Chamber Sealed</h3>
+                <p>"The verdicts are kept in the judge's chamber. Only those with authority may review the judgments."</p>
+                <p style="margin-top:1rem; color:#e94560;">Data evaluasi hanya dapat dilihat oleh admin MPK.</p>
+            </div>
+            <div id="evaluasi-admin" class="admin-section">
+                <div class="glass-card data-table">
+                    <h3>Verdict Archive</h3>
+                    <button onclick="exportToExcel('evaluasi')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Verdicts to Excel</button>
+                    <button onclick="resetData('evaluasi')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Evaluasi Data</button>
+                    <table id="evaluasi-table">
+                        <thead><tr><th>Verdict #</th><th>Timestamp</th><th>Judge</th><th>Courtroom</th><th>Performance</th><th>Score</th><th>Judgment</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SARAN -->
+        <section id="saran" class="page-section">
+            <div class="glass-card form-container">
+                <h2>&#128172; Whispered Truth</h2>
+                <p class="form-subtitle">"In the shadows, we speak truth to power. Your suggestion is our conspiracy for good."</p>
+                <div id="saran-success" class="success-message">&#10003; Your whispered truth has been heard in the darkness. The conspiracy begins.</div>
+                <form id="saran-form">
+                    <div class="form-group"><label>Anonymous Informant *</label><input type="text" id="saran-nama" required placeholder="Nama lengkap Anda"></div>
+                    <div class="form-group"><label>Source Location *</label><input type="text" id="saran-kelas" placeholder="Contoh: X-1, XI-2, XII-3" required></div>
+                    <div class="form-group">
+                        <label>Whisper Directed To *</label>
+                        <select id="saran-tujuan" required>
+                            <option value="">Pilih Tujuan</option>
+                            <option value="Untuk OSIS">&#127963;&#65039; Untuk OSIS</option>
+                            <option value="Untuk MPK">&#127917; Untuk MPK</option>
+                            <option value="Untuk Sekolah">&#127979; Untuk Sekolah</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Your Secret Message *</label><textarea id="saran-isi" required placeholder="Bisikkan saran Anda dalam kegelapan..."></textarea></div>
+                    <button type="submit" class="btn">Send Whisper</button>
+                </form>
+            </div>
+            <div class="glass-card admin-login">
+                <h3>&#128274; Secret Archive Access</h3>
+                <p style="color:#777; margin-bottom:1rem;">Enter the secret code to view whispered truths</p>
+                <input type="password" id="admin-password-saran" placeholder="Secret Code">
+                <button onclick="checkAdminPassword('saran')" class="btn">Unlock Whispers</button>
+            </div>
+            <div id="saran-locked" class="glass-card locked-message">
+                <h3>&#128274; Whispers Encrypted</h3>
+                <p>"The whispered truths are kept in encrypted files. Only the inner circle may access the secrets."</p>
+                <p style="margin-top:1rem; color:#e94560;">Data saran hanya dapat dilihat oleh admin MPK.</p>
+            </div>
+            <div id="saran-admin" class="admin-section">
+                <div class="glass-card data-table">
+                    <h3>Whispered Archive</h3>
+                    <button onclick="exportToExcel('saran')" class="btn btn-secondary" style="margin-bottom:1.5rem;">&#128229; Export Whispers to Excel</button>
+                    <button onclick="resetData('saran')" class="btn btn-danger" style="margin-bottom:1.5rem;">&#128465; Reset Saran Data</button>
+                    <table id="saran-table">
+                        <thead><tr><th>Whisper #</th><th>Timestamp</th><th>Informant</th><th>Source</th><th>Directed To</th><th>Secret Message</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div><!-- end .container -->
+
+    <script>
+        let aspirationData = JSON.parse(localStorage.getItem('aspirationData')) || [];
+        let evaluationData = JSON.parse(localStorage.getItem('evaluationData')) || [];
+        let suggestionData  = JSON.parse(localStorage.getItem('suggestionData'))  || [];
+
+        // ── Ganti password di sini ──
+        const ADMIN_PASSWORD = "mpk2024";
+
+        /* Navigation */
+        function switchPage(page) {
+            const homeWrapper = document.getElementById('home-page');
+            if (page === 'home') {
+                homeWrapper.style.display = 'block';
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                document.getElementById('home').classList.add('active');
+            } else {
+                homeWrapper.style.display = 'none';
+                document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById(page);
+                if (target) target.classList.add('active');
+            }
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.toggle('active', l.getAttribute('data-page') === page);
+            });
+            document.querySelectorAll('.banner-item').forEach(l => {
+                l.classList.toggle('active-nav', l.getAttribute('data-page') === page);
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.nav-link, .banner-item, .cta-btn').forEach(el => {
+            el.addEventListener('click', e => {
+                e.preventDefault();
+                const page = el.getAttribute('data-page');
+                if (page) switchPage(page);
+            });
+        });
+
+        /* Admin unlock */
+        function checkAdminPassword(type) {
+            const pw = document.getElementById('admin-password-' + type).value;
+            if (pw === ADMIN_PASSWORD) {
+                document.getElementById(type + '-locked').style.display = 'none';
+                document.getElementById(type + '-admin').classList.add('unlocked');
+                if (type === 'aspirasi') updateChart();
+                updateTable(type);
+                alert('🔓 Archives unlocked. Welcome, detective.');
+            } else {
+                alert('❌ Invalid code. Access denied.');
+            }
+        }
+
+        /* Chart */
+        let aspirationChart;
+        function initChart() {
+            const ctx = document.getElementById('aspirationChart');
+            if (!ctx) return;
+            aspirationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Crime Cases',
+                        data: [],
+                        backgroundColor: 'rgba(233,69,96,0.75)',
+                        borderColor: '#e94560',
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: { duration: 1000, easing: 'easeInOutQuart' },
+                    plugins: { legend: { labels: { color: '#e0e0e0' } } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#e0e0e0', stepSize: 1 }, grid: { color: 'rgba(233,69,96,0.1)' } },
+                        x: { ticks: { color: '#e0e0e0' }, grid: { color: 'rgba(233,69,96,0.1)' } }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!aspirationChart) initChart();
+            const counts = {};
+            aspirationData.forEach(i => { counts[i.kategori] = (counts[i.kategori] || 0) + 1; });
+            aspirationChart.data.labels = Object.keys(counts);
+            aspirationChart.data.datasets[0].data = Object.values(counts);
+            aspirationChart.update('active');
+        }
+
+        /* Form handlers */
+        document.getElementById('aspirasi-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const d = {
+                tanggal:  new Date().toLocaleString('id-ID'),
+                nama:     document.getElementById('aspirasi-nama').value,
+                kelas:    document.getElementById('aspirasi-kelas').value,
+                kategori: document.getElementById('aspirasi-kategori').value,
+                isi:      document.getElementById('aspirasi-isi').value
+            };
+            aspirationData.push(d);
+            localStorage.setItem('aspirationData', JSON.stringify(aspirationData));
+            if (document.getElementById('aspirasi-admin').classList.contains('unlocked')) {
+                updateTable('aspirasi'); updateChart();
+            }
+            showSuccess('aspirasi'); e.target.reset();
+        });
+
+        document.getElementById('evaluasi-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const d = {
+                tanggal: new Date().toLocaleString('id-ID'),
+                nama:    document.getElementById('evaluasi-nama').value,
+                kelas:   document.getElementById('evaluasi-kelas').value,
+                program: document.getElementById('evaluasi-program').value,
+                rating:  document.getElementById('evaluasi-rating').value,
+                isi:     document.getElementById('evaluasi-isi').value
+            };
+            evaluationData.push(d);
+            localStorage.setItem('evaluationData', JSON.stringify(evaluationData));
+            if (document.getElementById('evaluasi-admin').classList.contains('unlocked')) updateTable('evaluasi');
+            showSuccess('evaluasi'); e.target.reset();
+        });
+
+        document.getElementById('saran-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const d = {
+                tanggal: new Date().toLocaleString('id-ID'),
+                nama:    document.getElementById('saran-nama').value,
+                kelas:   document.getElementById('saran-kelas').value,
+                tujuan:  document.getElementById('saran-tujuan').value,
+                isi:     document.getElementById('saran-isi').value
+            };
+            suggestionData.push(d);
+            localStorage.setItem('suggestionData', JSON.stringify(suggestionData));
+            if (document.getElementById('saran-admin').classList.contains('unlocked')) updateTable('saran');
+            showSuccess('saran'); e.target.reset();
+        });
+
+        function showSuccess(type) {
+            const m = document.getElementById(type + '-success');
+            m.style.display = 'block';
+            setTimeout(() => { m.style.display = 'none'; }, 5000);
+        }
+
+        function updateTable(type) {
+            const tbody = document.querySelector('#' + type + '-table tbody');
+            const data  = type === 'aspirasi' ? aspirationData : type === 'evaluasi' ? evaluationData : suggestionData;
+            tbody.innerHTML = '';
+            data.forEach((item, i) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = i + 1;
+                row.insertCell(1).textContent = item.tanggal;
+                row.insertCell(2).textContent = item.nama;
+                row.insertCell(3).textContent = item.kelas;
+                if (type === 'aspirasi') {
+                    row.insertCell(4).textContent = item.kategori;
+                    row.insertCell(5).textContent = item.isi;
+                } else if (type === 'evaluasi') {
+                    row.insertCell(4).textContent = item.program;
+                    row.insertCell(5).textContent = '⭐'.repeat(parseInt(item.rating));
+                    row.insertCell(6).textContent = item.isi;
+                } else {
+                    row.insertCell(4).textContent = item.tujuan;
+                    row.insertCell(5).textContent = item.isi;
+                }
+            });
+        }
+
+        function exportToExcel(type) {
+            const data = type === 'aspirasi' ? aspirationData : type === 'evaluasi' ? evaluationData : suggestionData;
+            const name = type === 'aspirasi' ? 'Crime_Evidence_Archive.xlsx' : type === 'evaluasi' ? 'Verdict_Records.xlsx' : 'Whispered_Truth_Archive.xlsx';
+            if (!data.length) { alert('No evidence to export. The archive is empty.'); return; }
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, type);
+            XLSX.writeFile(wb, name);
+        }
+
+        /* Reset Data */
+        function resetData(type) {
+            const confirmMsg = type === 'all' 
+                ? '⚠️ WARNING: This will DELETE ALL DATA from Aspirasi, Evaluasi, AND Saran!\n\nAre you absolutely sure?' 
+                : `⚠️ Are you sure you want to delete all ${type.toUpperCase()} data?\n\nThis action cannot be undone!`;
+            
+            if (!confirm(confirmMsg)) return;
+
+            // Double confirm for safety
+            const secondConfirm = confirm('🚨 FINAL CONFIRMATION\n\nClick OK to permanently delete the data.');
+            if (!secondConfirm) return;
+
+            if (type === 'all') {
+                aspirationData = [];
+                evaluationData = [];
+                suggestionData = [];
+                localStorage.removeItem('aspirationData');
+                localStorage.removeItem('evaluationData');
+                localStorage.removeItem('suggestionData');
+                
+                updateTable('aspirasi');
+                updateTable('evaluasi');
+                updateTable('saran');
+                updateChart();
+                
+                alert('✅ All data has been permanently deleted.');
+            } else {
+                if (type === 'aspirasi') {
+                    aspirationData = [];
+                    localStorage.removeItem('aspirationData');
+                    updateTable('aspirasi');
+                    updateChart();
+                } else if (type === 'evaluasi') {
+                    evaluationData = [];
+                    localStorage.removeItem('evaluationData');
+                    updateTable('evaluasi');
+                } else if (type === 'saran') {
+                    suggestionData = [];
+                    localStorage.removeItem('suggestionData');
+                    updateTable('saran');
+                }
+                alert(`✅ All ${type} data has been deleted.`);
+            }
+        }
+    </script>
+</body>
+</html>
